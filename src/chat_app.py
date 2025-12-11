@@ -83,6 +83,7 @@ async def get_cached_image_description(image_url: str, image_cache: dict) -> str
         description = await loop.run_in_executor(thread_pool, get_image_description, image_url)
         image_cache[image_url] = description
         logger.info("Cached image description", extra={"url": image_url[:50]})
+        logger.info("Cached image description", extra={"url": image_url[:50]})
         return description
     except Exception as e:
         logger.error("Failed to get image description", extra={"url": image_url[:50], "error": str(e)})
