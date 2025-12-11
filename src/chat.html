@@ -256,6 +256,22 @@
         var ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
         var ws = new WebSocket(ws_scheme + "://" + window.location.host + "/ws");
         var conversationHistory = [];
+        var wsReady = false;
+        
+        ws.onopen = function() {
+            wsReady = true;
+            console.log("WebSocket connection established");
+        };
+        
+        ws.onerror = function(error) {
+            console.error("WebSocket error:", error);
+            wsReady = false;
+        };
+        
+        ws.onclose = function() {
+            wsReady = false;
+            console.log("WebSocket connection closed");
+        };
         
         function formatConversationHistory() {
             return conversationHistory.map(item => {
@@ -348,10 +364,22 @@
         }
         
         function sendMessage() {
+            // Check if WebSocket is ready
+            if (!wsReady || ws.readyState !== WebSocket.OPEN) {
+                console.log("WebSocket not ready, waiting...");
+                setTimeout(sendMessage, 100);
+                return;
+            }
+            
             var input = document.getElementById("messageInput");
             var imageCheckbox = document.getElementById("sendImageCheckbox");
             var hasImage = imageCheckbox.checked;
             var message = input.value;
+            
+            if (!message.trim()) {
+                return;
+            }
+            
             var payload = {
                 conversation_history: formatConversationHistory(),
                 has_image: hasImage,

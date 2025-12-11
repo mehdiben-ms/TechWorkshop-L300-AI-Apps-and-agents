@@ -1,5 +1,5 @@
 parameters.json
-
+venv/
 .scan_*/
 
 # OS files
